@@ -7,20 +7,61 @@
 //
 
 import UIKit
+
 @IBDesignable
 
-class CSStpper: UIView {
+
+public class CSStpper: UIView {
     
     public var leftBtn = UIButton(type: .system) // 좌측 버튼
     public var rightBtn = UIButton(type: .system) // 우측 버튼
     public var centerLabel = UILabel() // 중앙 레이블
+    
+    @IBInspectable
     public var value: Int = 0 { // 프로퍼티의 값이 바뀌면 자동으로 호출된다.
         didSet { // 즉, value의 속성값을 변경하는 버튼의 액션 메소드의 값이 변경되는 것을
             // 관찰하다가 변경이 되면, centerLabel에 스트링값으로 표시해준다.
             self.centerLabel.text = String(value)
         }
-        
     }// 스테퍼의 현재값을 저장할 변수
+    
+    
+    // 프로퍼티 옵저버 내에서는 각각의 프로퍼티에 대입된 값을 이용하여 좌우측 버튼의 텍스트를 설정하고있음.
+    // 초기값을 설정해두고 어디선가 만약 변경된다면 변경된 값을 버튼의 텍스트로 설정해줌.
+    
+    // 좌측 버튼의 타이틀 속성
+    @IBInspectable
+    public var leftTitle: String = "↓" {
+        didSet {
+            self.leftBtn.setTitle(leftTitle, for: .normal)
+        }
+    }
+    
+    // 우측 버튼의 타이틀
+    @IBInspectable
+    public var rightTitle: String = "↑" {
+        didSet {
+            self.rightBtn.setTitle(rightTitle, for: .normal)
+        }
+    }
+    
+    
+    @IBInspectable
+    public var bgColor: UIColor = UIColor.cyan {
+        didSet {
+            self.centerLabel.backgroundColor = backgroundColor // 옵저버가 바탕색의 변화를 관찰하고 있다가
+            // 어딘가에서 색이 변경되면 중앙 라벨에 적용시켜줌.
+        }
+    }
+    
+    // 중간값 단위
+    @IBInspectable
+    public var stepValue: Int = 1
+    
+    // 최대값과 최소값
+    public var maximumValue : Int = 100
+    public var minimumValue : Int = -100
+    
     
     // 스토리보드에서 호출할 초기화 메소드
     public required init?(coder aDecoder: NSCoder) {
@@ -42,7 +83,11 @@ class CSStpper: UIView {
         let borderColor = UIColor.blue.cgColor // 테두리 색상값
         
         self.leftBtn.tag = -1 // 태그 값에 -1을 부여
-        self.leftBtn.setTitle("↓", for: .normal) // 버튼 타이틀
+        
+        //self.leftBtn.setTitle("↓", for: .normal) // 버튼 타이틀
+        self.leftBtn.setTitle(self.leftTitle, for: .normal) // 저장프로퍼티를 새로 정의해줬으므로
+        // 초기값을 배당해줌.
+        
         self.leftBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20) // 버튼 폰트
         
         self.leftBtn.layer.borderWidth = borderWidth // 버튼 테두리 두께
@@ -50,7 +95,11 @@ class CSStpper: UIView {
         
         // 우측 업 버튼 속성 설정
         self.rightBtn.tag = 1 // 태그값 1을 부여
-        self.rightBtn.setTitle("↑", for: .normal) // 버튼의 타이틀
+        
+        // self.rightBtn.setTitle("↑", for: .normal) // 버튼의 타이틀
+        self.rightBtn.setTitle(self.rightTitle, for: .normal) // 저장프로퍼티를 새로 정의해줬으므로
+        // 초기값을 배당해줌.
+        
         self.rightBtn.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20) // 버튼 타이틀의 폰트
         
         self.rightBtn.layer.borderWidth = borderWidth // 버튼 테두리의 두께
@@ -61,7 +110,11 @@ class CSStpper: UIView {
         self.centerLabel.text = String(value) // 컨트롤의 현재값을 문자열로 변환하여 표시
         self.centerLabel.font = UIFont.systemFont(ofSize: 16)
         self.centerLabel.textAlignment = .center // 가운데 정렬
-        self.centerLabel.backgroundColor = UIColor.cyan // 배경색상
+        
+        // self.centerLabel.backgroundColor = UIColor.cyan // 배경색상
+        self.centerLabel.backgroundColor = self.bgColor
+        // 배경색을 옵저버가 추가된 저장프로퍼티를 추가해 줬으므로 저장프로퍼티로 배경색을 초기화해줌.
+        
         self.centerLabel.layer.borderWidth = borderWidth // 레이블의 테두리 두께
         self.centerLabel.layer.borderColor = borderColor // 테두리 색상 파란색
         
@@ -78,10 +131,26 @@ class CSStpper: UIView {
         
     }
     
+ 
+    
     // value 속성의 값을 변경하는 메소드
     @objc public func valueChange (_ sender: UIButton) {
+        
+        // 스테퍼의 값을 변경하기 전에, 미리 최소값과 최대값 범위를 벗어나지 않는지 체크한다.
+        let sum = self.value + (sender.tag * self.stepValue)
+        
+        // 더한 결과가 최대값보다 크면 값을 변경하지 않고 종료
+        if sum > self.maximumValue {
+            return
+        }
+        
+        // 더한 결과가 최소값보다 작으면 값을 변경하지 않고 종료
+        if sum < self.minimumValue {
+            return
+        }
+        
         // 현재의 value 값에 +1 또는 -1 한다.
-        self.value += sender.tag
+        self.value += (sender.tag * self.stepValue )
     }
     
     override public func layoutSubviews() { // 이 메소드는 뷰의 크기가 변할 때 호출되는 메소드
