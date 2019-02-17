@@ -65,6 +65,27 @@ class CSStpper: UIView {
         
     }
     
-    
+    override public func layoutSubviews() { // 이 메소드는 뷰의 크기가 변할 때 호출되는 메소드
+        // 스토리보드에서 리사이징 핸들로 드래그하여 크기를 바꾸거나 프로그래밍 코드로 뷰의 속성값을 변경할때
+        // 즉 위의 두가지 방법으로 뷰의 크기를 조절할때 그때마다 자동으로 호출되는 메소드
+        // 뷰의 내부의 객체들이 있다면 이 메소드 내부에 객체의 크기를 조절하는 구문을 작성함으로써
+        // 뷰의 크기 변화에 적절히 대응 가능한다.
+        super.layoutSubviews()
+        
+        // 버튼과 레이블 사이지를 계산식으로 구현하여 상수에 대입
+        // 버튼의 너비 = 뷰 높이
+        let btnWidth = self.frame.height
+        
+        // 레이블의 너비 = 뷰 전체 크기 - 양쪽 버튼의 너비 합
+        let lblWidth = self.frame.width - ( btnWidth * 2 )
+        
+        // 버튼과 레이블 사이지를 정적인 값으로 설정하지 않고 뷰가 늘어나고 줄어듬에 따라 그 뷰에 맞추어 버튼과 레이블이 동적으로 늘어남.
+        
+        // 버튼의 너비와 레이블의 너비를 각 객체에 적용함
+        self.leftBtn.frame = CGRect(x: 0, y: 0, width: btnWidth, height: btnWidth)
+        self.centerLabel.frame = CGRect(x: btnWidth, y: 0, width: lblWidth, height: btnWidth)
+        self.rightBtn.frame = CGRect(x: btnWidth + lblWidth, y: 0, width: btnWidth, height: btnWidth)
+        
+    }
     
 }
