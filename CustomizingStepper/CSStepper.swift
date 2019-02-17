@@ -7,12 +7,20 @@
 //
 
 import UIKit
+@IBDesignable
+
 class CSStpper: UIView {
     
     public var leftBtn = UIButton(type: .system) // 좌측 버튼
     public var rightBtn = UIButton(type: .system) // 우측 버튼
     public var centerLabel = UILabel() // 중앙 레이블
-    public var value: Int = 0 // 스테퍼의 현재값을 저장할 변수
+    public var value: Int = 0 { // 프로퍼티의 값이 바뀌면 자동으로 호출된다.
+        didSet { // 즉, value의 속성값을 변경하는 버튼의 액션 메소드의 값이 변경되는 것을
+            // 관찰하다가 변경이 되면, centerLabel에 스트링값으로 표시해준다.
+            self.centerLabel.text = String(value)
+        }
+        
+    }// 스테퍼의 현재값을 저장할 변수
     
     // 스토리보드에서 호출할 초기화 메소드
     public required init?(coder aDecoder: NSCoder) {
@@ -57,12 +65,23 @@ class CSStpper: UIView {
         self.centerLabel.layer.borderWidth = borderWidth // 레이블의 테두리 두께
         self.centerLabel.layer.borderColor = borderColor // 테두리 색상 파란색
         
+        
+        // 버튼의 터치 이벤트와 valueChange(_:) 메소드를 연결한다.
+        self.leftBtn.addTarget(self, action: #selector(valueChange(_:)), for: .touchUpInside)
+        self.rightBtn.addTarget(self, action: #selector(valueChange(_:)), for: .touchUpInside)
+        
         // 영역별 객체를 서브 뷰로 추가한다.
         // 현재 구현하고 있는 CSStepper 자체가 루트뷰이기 때문에 서브뷰로 구현된 객체 3개를 추가해준다,
         self.addSubview(self.leftBtn)
         self.addSubview(self.rightBtn)
         self.addSubview(self.centerLabel)
         
+    }
+    
+    // value 속성의 값을 변경하는 메소드
+    @objc public func valueChange (_ sender: UIButton) {
+        // 현재의 value 값에 +1 또는 -1 한다.
+        self.value += sender.tag
     }
     
     override public func layoutSubviews() { // 이 메소드는 뷰의 크기가 변할 때 호출되는 메소드
