@@ -11,7 +11,7 @@ import UIKit
 @IBDesignable
 
 
-public class CSStpper: UIView {
+public class CSStpper: UIControl { //UIControl을 서브 클래싱하면 CSStepper 객체에 액션 이벤트를 연결할수있음
     
     public var leftBtn = UIButton(type: .system) // 좌측 버튼
     public var rightBtn = UIButton(type: .system) // 우측 버튼
@@ -22,6 +22,12 @@ public class CSStpper: UIView {
         didSet { // 즉, value의 속성값을 변경하는 버튼의 액션 메소드의 값이 변경되는 것을
             // 관찰하다가 변경이 되면, centerLabel에 스트링값으로 표시해준다.
             self.centerLabel.text = String(value)
+            
+            // 이 클래스를 사용하는 객체들에게 valueChange 이벤트 신호를 보내준다.
+            // sendActions(for:)는 인자값으로 입력된 타입의 이벤트를 발생시키는 메소드
+            // 이는 value 값이 바뀌면 valuedChanged 이벤트를 발생시키라는 의미.
+            self.sendActions(for: .valueChanged)
+            
         }
     }// 스테퍼의 현재값을 저장할 변수
     
